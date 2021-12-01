@@ -6,12 +6,12 @@ import { NotAuthorizedError, ConflictError } from '../helpers/index.js'
 class AuthService {
   // eslint-disable-next-line no-useless-constructor
   constructor() { }
-  static async registration(email, password) {
+  static async registration(email, password, name) {
     const foundEmail = await User.findOne({ email })
     if (foundEmail) {
       throw new ConflictError(`Email '${email}' in use .`)
     }
-    const user = new User({ email, password })
+    const user = new User({ email, password, name })
     await user.save()
     return user
   }

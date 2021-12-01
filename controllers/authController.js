@@ -7,14 +7,14 @@ class AuthController {
   constructor() { }
 
   static async registrationCtrl(req, res) {
-    const { email, password } = req.body
-    const user = await AuthService.registration(email, password)
+    const { email, password, name } = req.body
+    const user = await AuthService.registration(email, password, name)
     res.json({
       success: true,
       code: HttpCodes.OK,
       user: {
         email: user.email,
-        subscription: user.subscription
+        name: user.name,
       },
       message: `User '${email}' registered.`
     })
