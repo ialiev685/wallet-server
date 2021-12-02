@@ -16,12 +16,23 @@ class AuthController {
         email: user.email,
         name: user.name,
       },
-      message: `User '${email}' registered.`
+      message: `User '${user.name}' registered.`
     })
   }
 
   static async loginCtrl(req, res) {
-
+    const { email, password } = req.body
+    const { token, user } = await AuthService.login(email, password)
+    res.json({
+      success: true,
+      code: HttpCodes.OK,
+      token: token,
+      user: {
+        email: user.email,
+        name: user.name
+      },
+      message: `User '${user.name}' is logged in successfully.`
+    })
   }
 
   static async logoutCtrl(req, res) {

@@ -21,5 +21,12 @@ app.use('/api/users', authRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use(errorHandler)
+app.use((_, res) => {
+  res.status(404).json({
+    status: 'error',
+    code: 404,
+    message: 'Not found'
+  })
+})
 
 export default app

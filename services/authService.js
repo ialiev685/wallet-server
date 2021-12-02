@@ -17,7 +17,22 @@ class AuthService {
   }
 
   static async login(email, password) {
-  
+    const user = await User.findOne({ email })
+    if (!user) {
+      throw new NotAuthorizedError(`No user with email '${email}' found.`)
+    }
+    if (!await bcrypt.compare(password, user.password)) {
+      throw new NotAuthorizedError('Wrong password.')
+    }
+    const token = jwt.sign({
+      _id: user._id,
+      name: user.name
+    }, process.env.JWT_SECRET)
+    await User.findOneAndUpdate(
+      { email },
+      { token }
+    )
+    return { token, user }
   }
 
   static async logout(id) {

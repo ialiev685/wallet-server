@@ -10,7 +10,7 @@ const json = {
     ],
     
     "paths": {
-        "/signup":
+        "/api/transactions/signup":
         {
             "post": {
                 "description": "Returns object with users data used for registration",

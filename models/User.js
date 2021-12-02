@@ -17,7 +17,14 @@ const userSchema = new Schema({
     type: String,
    required: [true, 'Name is required'],
   },
+  balance: {
+    type: Number,
+    default: 0,
+  },
+}, {
+    versionKey: false,
 })
+  
 const joiUserSchema = Joi.object({
   password: Joi.string().min(5).max(20).required(),
   email: Joi.string().email().required(),

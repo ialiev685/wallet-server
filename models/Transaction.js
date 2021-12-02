@@ -16,6 +16,15 @@ const TransactionSchema = new Schema(
       type: String,
       required: [true, 'Set transaction date '],
     },
+    day: {
+      type: Number,
+    },
+    month: {
+      type: Number,
+    },
+    year: {
+      type: Number,
+    },
     comment: {
       type: String,
     },
@@ -26,6 +35,9 @@ const TransactionSchema = new Schema(
       type: mongoose.ObjectId,
       ref: 'user',
     },
+     balance: {
+    type: Number
+  },
   }, {
     versionKey: false,
   }
