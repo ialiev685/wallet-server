@@ -28,7 +28,7 @@ const userSchema = new Schema({
 const joiUserSchema = Joi.object({
   password: Joi.string().min(5).max(20).required(),
   email: Joi.string().email().required(),
-  name: Joi.string().required(),
+  name: Joi.string(),
 })
 
 userSchema.pre('save', async function () {

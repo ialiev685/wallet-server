@@ -1,11 +1,16 @@
 import express from 'express'
 import logger from 'morgan'
 import cors from 'cors'
-import swaggerUi from 'swagger-ui-express'
-import swaggerDocument from './swagger.js'
 
 import { transactionsRouter, authRouter } from './routes/api/index.js'
 import { errorHandler } from './helpers/index.js'
+
+import fs from 'fs';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express'
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(`${path.resolve()}/swagger.json`)
+);
 
 const app = express()
 
