@@ -13,16 +13,16 @@ const TransactionSchema = new Schema(
       required: [true, 'Set transaction  sum '],
     },
     date: {
-      type: String,
+      type: Date,
       required: [true, 'Set transaction date '],
     },
-    day: {
+    trDay: {
       type: Number,
     },
-    month: {
+    trMonth: {
       type: Number,
     },
-    year: {
+    trYear: {
       type: Number,
     },
     comment: {
@@ -39,13 +39,13 @@ const TransactionSchema = new Schema(
     type: Number
   },
   }, {
-    versionKey: false,
+    versionKey: false
   }
 )
 const joiTransactionSchema = Joi.object({
   transactionType: Joi.boolean().required(),
   sum: Joi.number().required(),
-  date: Joi.string().required(),
+  date: Joi.date().required(),
   category: Joi.string().optional(),
 })
 

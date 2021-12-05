@@ -28,6 +28,20 @@ class TransactionsController {
   }
 
   static async getTransactionsStatisticCtrl(req, res) {
+      const { _id, name } = req.user
+    const statistic = await TransactionsService.getTransactionsStatistic( _id)
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        statistic,
+      },
+      message: `User ${name} expense statistics`
+    })
+
+  }
+
+  static async addTransactionCategoriesCtrl(req, res) {
 
   }
 }

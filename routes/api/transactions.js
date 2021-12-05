@@ -19,6 +19,8 @@ router.get('/statistic', asyncWrapper(TransactionsController.getTransactionsStat
 
 router.post('/', addValidation, asyncWrapper(TransactionsController.addTransactionCtrl))
 
+router.post('/categories', asyncWrapper(TransactionsController.addTransactionCategoriesCtrl))
+
 
 
 export default router
