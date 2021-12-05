@@ -69,8 +69,16 @@ class ContactsService {
     
   }
 
-  static async getTransactionsStatistic(owner) {
-    const transactions = await Transaction.find({owner})
+  static async getTransactionsStatistic(owner, month, year) {
+    let transactions
+   
+    if (year) {
+      transactions = await Transaction.find({ owner, trYear:year })
+  
+    } else {
+      transactions = await Transaction.find({ owner, trYear: new Date().getFullYear(), trMonth:month })
+      console.log(new Date().getFullYear())
+      }
     const statistic = transactions.reduce((acc,el) => {
       const category = el.category
       const sum = el.sum

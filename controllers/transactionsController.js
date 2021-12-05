@@ -28,8 +28,9 @@ class TransactionsController {
   }
 
   static async getTransactionsStatisticCtrl(req, res) {
-      const { _id, name } = req.user
-    const statistic = await TransactionsService.getTransactionsStatistic( _id)
+    const { _id, name } = req.user
+    const {month, year}=req.query
+    const statistic = await TransactionsService.getTransactionsStatistic( _id, month, year)
     return res.send({
       success: true,
       code: HttpCodes.OK,
