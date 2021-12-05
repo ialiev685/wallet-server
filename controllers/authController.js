@@ -27,7 +27,8 @@ class AuthController {
       success: true,
       code: HttpCodes.OK,
       token: token,
-      user: {
+      userData: {
+        id: user._id,
         email: user.email,
         name: user.name,
       },
