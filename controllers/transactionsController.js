@@ -1,35 +1,45 @@
 /* eslint-disable no-useless-constructor */
 
-import { HttpCodes } from '../constants.js'
-import { TransactionsService } from '../services/index.js'
+import { HttpCodes } from '../constants.js';
+import { TransactionsService } from '../services/index.js';
 
 class TransactionsController {
-  constructor() { }
+  constructor() {}
 
   static async addTransactionCtrl(req, res) {
-    const { _id } = req.user
-    const transaction = await TransactionsService.addTransaction(req.body, _id)
+    const { _id } = req.user;
+    const transaction = await TransactionsService.addTransaction(req.body, _id);
     return res.send({
       success: true,
       code: HttpCodes.CREATED,
       data: {
         transaction,
       },
-      message: 'Transaction created!'
-    })
+      message: 'Transaction created!',
+    });
   }
 
   static async getTransactionsCtrl(req, res) {
+    const { _id } = req.user;
+    const userTransactions = await TransactionsService.getTransactions(_id);
 
+    if (!userTransactions) {
+      res.json({
+        message: 'No transactions',
+      });
+    }
+
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      message: `All transactions of ${req.user.name}`,
+      data: { userTransactions },
+    });
   }
 
-  static async getTransactionCategoriesCtrl(req, res) {
+  static async getTransactionCategoriesCtrl(req, res) {}
 
-  }
-
-  static async getTransactionsStatisticCtrl(req, res) {
-
-  }
+  static async getTransactionsStatisticCtrl(req, res) {}
 }
 
-export default TransactionsController
+export default TransactionsController;

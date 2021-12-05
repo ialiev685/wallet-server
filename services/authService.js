@@ -39,7 +39,10 @@ class AuthService {
     await User.findByIdAndUpdate(_id, { token: null });
   }
 
-  static async findCurrentUser(id) {}
+  static async findCurrentUser(id) {
+    const currentUser = await User.findById(id);
+    return currentUser;
+  }
 }
 
 export default AuthService;
