@@ -29,7 +29,9 @@ const TransactionSchema = new Schema(
       type: String,
     },
     category: {
-      type: String,
+      type: mongoose.ObjectId,
+      ref: 'category',
+      default: '61ad8b50c505a94bdf0693a7'
     },
     owner: {
       type: mongoose.ObjectId,

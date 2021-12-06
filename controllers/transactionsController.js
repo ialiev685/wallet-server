@@ -24,7 +24,16 @@ class TransactionsController {
   }
 
   static async getTransactionCategoriesCtrl(req, res) {
-
+    const { _id, name } = req.user
+    const categories = await TransactionsService.getTransactionCategories( _id)
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        categories,
+      },
+      message: `User ${name} transaction categories`
+    })
   }
 
   static async getTransactionsStatisticCtrl(req, res) {
@@ -43,7 +52,17 @@ class TransactionsController {
   }
 
   static async addTransactionCategoriesCtrl(req, res) {
-
+    const { _id} = req.user
+    const {name}=req.body
+    const category = await TransactionsService.addTransactionCategory( _id, name)
+    return res.send({
+      success: true,
+      code: HttpCodes.CREATED,
+      data: {
+        category,
+      },
+      message: `User added a category`
+    })
   }
 }
 

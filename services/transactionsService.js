@@ -1,12 +1,13 @@
 import { Transaction, User, Category } from '../models/index.js'
-import { BadRequestError } from '../helpers/index.js'
+import { getRanHex, BadRequestError } from '../helpers/index.js'
+
 
 class ContactsService {
   // eslint-disable-next-line no-useless-constructor
   constructor() { }
   static async addTransaction(body, owner) {
     const {sum}=body
-    const [trDay,trMonth, trYear] = body.date.split('.')
+    const [trMonth, trDay, trYear] = body.date.split('.')
     const user = await User.findById(owner)
     
     let userBalance
@@ -23,7 +24,7 @@ class ContactsService {
     const nextTransactions = await Transaction.aggregate([{ $match: {owner}, $match: {  date: { '$gte': new Date(body.date) }  } }])
     const previousTransactions = await Transaction.aggregate([{ $match: {owner},$match: { date: { '$lt': new Date(body.date) }  }}]).sort({ date: -1 })
     const previousTransaction = previousTransactions[0]
-    console.log(previousTransaction);
+   
     if (nextTransactions.length===0) {
       const transaction = await Transaction.create({ ...body, trDay, trMonth, trYear, owner, balance: userBalance })
       return transaction
@@ -46,7 +47,7 @@ class ContactsService {
     const transaction = await Transaction.create({ ...body, trDay, trMonth, trYear, owner, balance: userBalance })
 
     if (nextTransactions) {
-      console.log(nextTransactions);
+     
       nextTransactions.map(async (el) => {
         const id = el._id
         if (body.transactionType) {
@@ -65,35 +66,57 @@ class ContactsService {
     
   }
 
-  static async getTransactionCategories() {
-    
+  static async getTransactionCategories(owner) {
+    const userCategories = await Category.find({ owner })
+    const basicCategories= await Category.find({basic:'basic'})
+    const selectedUserCategories = userCategories.map(el => el.name)
+    const selectedBasicCategories = basicCategories.map(el => el.name)
+    const categories = [...selectedBasicCategories, ...selectedUserCategories]
+    return categories
   }
 
   static async getTransactionsStatistic(owner, month, year) {
     let transactions
-   
-    if (year) {
-      transactions = await Transaction.find({ owner, trYear:year })
+
+    if (year&&month) {
+      transactions = await Transaction.find({ owner, trYear:year, trMonth:month, transactionType:false })
+
+    }
+    if (year&&!month) {
+      transactions = await Transaction.find({ owner, trYear:year, transactionType:false})
   
-    } else {
-      transactions = await Transaction.find({ owner, trYear: new Date().getFullYear(), trMonth:month })
-      console.log(new Date().getFullYear())
-      }
-    const statistic = transactions.reduce((acc,el) => {
-      const category = el.category
+    } 
+    if(!year&&month) {
+      transactions = await Transaction.find({ owner, trYear: new Date().getFullYear(), trMonth:month, transactionType:false}).populate('category',{ name: 1 , hex: 1, _id: 0} )
+      
+    }
+
+    const statistic = transactions.reduce((acc, el) => {
+      const name = el.category.name
+      const hex= el.category.hex
       const sum = el.sum
-    
+     
       return {
         ...acc,
-        [category]: acc[category] ? acc[category] + sum : sum
+        [name]: {
+          'sum': acc[name]? acc[name].sum + sum : sum,
+          hex
+        }
       }
     }, {})
 
       return statistic
   }
 
- static async addTransactionCategoriesCtrl(req, res) {
-
+  static async addTransactionCategory(owner, name) {
+    const findingCategory = await Category.find({ owner, name })
+    
+    if (findingCategory.length!==0) {
+      throw Error( new BadRequestError('The user already has this category name.'))
+    }
+   const hex=getRanHex()
+   const category = await Category.create({ name, hex, owner })
+   return category
   }
 }
 

@@ -4,19 +4,29 @@ const { Schema } = mongoose
 
 const categorySchema = new Schema(
   {
-    categories: {
-      type: Array
+    name: {
+      type: String,
+      required: [true, 'Add transaction category ']
+    },
+    hex: {
+      type: String
     },
     owner: {
       type: mongoose.ObjectId,
       ref: 'user',
     },
+    basic: {
+      type: String
+    }
   }, {
     versionKey: false
   }
 )
 const joiCategorySchema = Joi.object({
   name: Joi.string().required(),
+  hex: Joi.string().optional(),
+  owner: Joi.string().optional(),
+  basic: Joi.string().optional()
 })
 
 const Category = mongoose.model('category', categorySchema)
