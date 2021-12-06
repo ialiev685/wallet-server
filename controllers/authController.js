@@ -8,6 +8,7 @@ class AuthController {
 
   static async registrationCtrl(req, res) {
     const { email, password, name } = req.body;
+    console.log('AuthController ~ registrationCtrl ~ name', name);
     const user = await AuthService.registration(email, password, name);
     res.json({
       success: true,
@@ -47,7 +48,20 @@ class AuthController {
     });
   }
 
-  static async findCurrentUserCtrl(req, res) {}
+  static async findCurrentUserCtrl(req, res) {
+    const { _id } = req.user;
+
+    const currentUser = await AuthService.findCurrentUser(_id);
+    res.json({
+      status: true,
+      code: HttpCodes.OK,
+      data: {
+        name: currentUser.name,
+        email: currentUser.email,
+        balance: currentUser.balance,
+      },
+    });
+  }
 }
 
 export default AuthController;
