@@ -27,9 +27,28 @@ class ContactsService {
 
     return transaction;
   }
-  static async getTransactions(owner) {
-    const transactions = await Transaction.find({ owner }).sort({ date: -1 });
-    return transactions;
+  static async getTransactions(req) {
+    const { _id } = req.user;
+    const { page = 1, limit = 5 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const pages = await Transaction.find({ owner: _id });
+
+    const transactions = await Transaction.find(
+      { owner: _id },
+      'date transactionType category comment sum balance',
+    )
+      .sort({ year: -1, month: -1, day: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPages = Math.ceil(pages.length / limit);
+    const data = {
+      totalTransactions: pages.length,
+      totalPages: totalPages,
+      transactions,
+    };
+    return data;
   }
 
   static async getTransactionCategories() {}

@@ -20,8 +20,7 @@ class TransactionsController {
   }
 
   static async getTransactionsCtrl(req, res) {
-    const { _id } = req.user;
-    const userTransactions = await TransactionsService.getTransactions(_id);
+    const userTransactions = await TransactionsService.getTransactions(req);
 
     if (!userTransactions) {
       res.json({
@@ -33,7 +32,7 @@ class TransactionsController {
       success: true,
       code: HttpCodes.OK,
       message: `All transactions of ${req.user.name}`,
-      data: { userTransactions },
+      userTransactions,
     });
   }
 
