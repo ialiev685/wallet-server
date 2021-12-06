@@ -34,7 +34,10 @@ class ContactsService {
 
     const pages = await Transaction.find({ owner: _id });
 
-    const transactions = await Transaction.find({ owner: _id })
+    const transactions = await Transaction.find(
+      { owner: _id },
+      'date transactionType category comment sum balance',
+    )
       .sort({ year: -1, month: -1, day: -1 })
       .skip(skip)
       .limit(limit);
