@@ -49,6 +49,7 @@ const joiTransactionSchema = Joi.object({
   sum: Joi.number().required(),
   date: Joi.date().required(),
   category: Joi.string().optional(),
+  comment: Joi.allow()
 })
 
 const Transaction = mongoose.model('transaction', TransactionSchema)
