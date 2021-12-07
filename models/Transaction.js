@@ -16,23 +16,25 @@ const TransactionSchema = new Schema(
       required: [true, 'Set transaction  sum '],
     },
     date: {
-      type: String,
+      type: Date,
       required: [true, 'Set transaction date '],
     },
-    day: {
+    trDay: {
       type: Number,
     },
-    month: {
+    trMonth: {
       type: Number,
     },
-    year: {
+    trYear: {
       type: Number,
     },
     comment: {
       type: String,
     },
     category: {
-      type: String,
+      type: mongoose.ObjectId,
+      ref: 'category',
+      default: '61ad8b50c505a94bdf0693a7'
     },
     owner: {
       type: mongoose.ObjectId,
@@ -44,15 +46,16 @@ const TransactionSchema = new Schema(
   },
   {
     versionKey: false,
-  },
-);
+  }
+)
+
 const joiTransactionSchema = Joi.object({
   transactionType: Joi.boolean().required(),
   sum: Joi.number().required(),
-  date: Joi.string().required(),
+  date: Joi.date().required(),
   category: Joi.string().optional(),
   comment: Joi.string().optional(),
-});
+})
 
 const Transaction = mongoose.model('transaction', TransactionSchema);
 

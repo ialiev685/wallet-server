@@ -4,15 +4,16 @@ import { User } from '../models/index.js';
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const [, token] = req.headers.authorization.split(' ');
+     const [bearer , token] = req.headers.authorization.split(' ')
     if (!token) {
-      next(new NotAuthorizedError('Invalid token'));
+      throw Error(new NotAuthorizedError('Invalid token'))
     }
 
     const realUser = await User.findOne({ token });
+    
     if (!realUser) {
-      next(new NotAuthorizedError('Invalid token'));
-    }
+      throw Error(new NotAuthorizedError('Invalid token'))
+      }
 
     const user = jwt.decode(token, process.env.JWT_SECRET);
     req.user = user;
