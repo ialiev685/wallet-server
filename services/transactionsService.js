@@ -107,6 +107,7 @@ class ContactsService {
       return {
         ...acc,
         [name]: {
+          'name':name,
           'sum': acc[name]? acc[name].sum + sum : sum,
           hex,
           id: generateId()
