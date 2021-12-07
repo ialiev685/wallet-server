@@ -9,7 +9,7 @@ class TransactionsController {
   static async addTransactionCtrl(req, res) {
     const { _id } = req.user;
     const transaction = await TransactionsService.addTransaction(req.body, _id);
-    return res.send({
+    return res.status(201).send({
       success: true,
       code: HttpCodes.CREATED,
       data: {
