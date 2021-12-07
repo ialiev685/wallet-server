@@ -1,5 +1,5 @@
 import { Transaction, User, Category } from '../models/index.js'
-import { getRanHex, BadRequestError } from '../helpers/index.js'
+import { getRanHex, BadRequestError, generateId } from '../helpers/index.js'
 
 
 class ContactsService {
@@ -69,8 +69,16 @@ class ContactsService {
   static async getTransactionCategories(owner) {
     const userCategories = await Category.find({ owner })
     const basicCategories= await Category.find({basic:'basic'})
-    const selectedUserCategories = userCategories.map(el => el.name)
-    const selectedBasicCategories = basicCategories.map(el => el.name)
+    const selectedUserCategories = userCategories.map(el => {
+      const categoryObj={
+       name: el.name,
+        id: el._id}
+      return categoryObj})
+    const selectedBasicCategories = basicCategories.map(el => {
+      const categoryObj={
+       name: el.name,
+        id: el._id}
+      return categoryObj})
     const categories = [...selectedBasicCategories, ...selectedUserCategories]
     return categories
   }
@@ -79,11 +87,11 @@ class ContactsService {
     let transactions
 
     if (year&&month) {
-      transactions = await Transaction.find({ owner, trYear:year, trMonth:month, transactionType:false })
+      transactions = await Transaction.find({ owner, trYear:year, trMonth:month, transactionType:false }).populate('category',{ name: 1 , hex: 1, _id: 0} )
 
     }
     if (year&&!month) {
-      transactions = await Transaction.find({ owner, trYear:year, transactionType:false})
+      transactions = await Transaction.find({ owner, trYear:year, transactionType:false}).populate('category',{ name: 1 , hex: 1, _id: 0} )
   
     } 
     if(!year&&month) {
@@ -95,12 +103,13 @@ class ContactsService {
       const name = el.category.name
       const hex= el.category.hex
       const sum = el.sum
-     
+     console.log( generateId());
       return {
         ...acc,
         [name]: {
           'sum': acc[name]? acc[name].sum + sum : sum,
-          hex
+          hex,
+          id: generateId()
         }
       }
     }, {})
