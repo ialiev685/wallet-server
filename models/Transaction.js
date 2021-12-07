@@ -1,12 +1,15 @@
-import mongoose from 'mongoose'
-import Joi from 'joi'
-const { Schema } = mongoose
+import mongoose from 'mongoose';
+import Joi from 'joi';
+const { Schema } = mongoose;
 
 const TransactionSchema = new Schema(
   {
     transactionType: {
       type: Boolean,
-      required: [true, 'Select the type of transaction: income(true) or expense(false)'],
+      required: [
+        true,
+        'Select the type of transaction: income(true) or expense(false)',
+      ],
     },
     sum: {
       type: Number,
@@ -37,21 +40,23 @@ const TransactionSchema = new Schema(
       type: mongoose.ObjectId,
       ref: 'user',
     },
-     balance: {
-    type: Number
+    balance: {
+      type: Number,
+    },
   },
-  }, {
-    versionKey: false
+  {
+    versionKey: false,
   }
 )
+
 const joiTransactionSchema = Joi.object({
   transactionType: Joi.boolean().required(),
   sum: Joi.number().required(),
   date: Joi.date().required(),
   category: Joi.string().optional(),
-  comment: Joi.allow()
+  comment: Joi.string().optional(),
 })
 
-const Transaction = mongoose.model('transaction', TransactionSchema)
+const Transaction = mongoose.model('transaction', TransactionSchema);
 
-export { Transaction, joiTransactionSchema }
+export { Transaction, joiTransactionSchema };
