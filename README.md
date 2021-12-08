@@ -1,3 +1,4 @@
-# wallet-server
+# Wallet Backend
 
-npm i bcryptjs cors dotenv http-errors joi jsonwebtoken mongoose morgan multer nodemailer nodemon
+Бэкенд для запросов к сервису 'Wallet'
+[Документация бэкенда](https://wallet-rf1.herokuapp.com/api-docs/)
