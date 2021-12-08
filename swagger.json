@@ -17,7 +17,7 @@
   ],
   "servers": [
     {
-      "url": "http://localhost:8081"
+      "url": "https://wallet-rf1.herokuapp.com"
     }
   ],
   "tags": [
@@ -243,17 +243,7 @@
         "summary": "Transactions categories",
         "parameters": [],
         "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Transactions's object categories",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TransactionsCategoriesRequest"
-              }
-            }
-          }
-        },
+        
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -278,33 +268,80 @@
             "content": {}
           }
         }
-      }
-    },
+      },
 
-    "/api/transactions/statistic": {
-      "get": {
+      "post": {
         "tags": ["Transactions"],
-        "summary": "Transactions statistic",
+        "summary": "Transactions categories add",
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Transactions's object statistic",
+          "description": "Transactions's categories add",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TransactionsStatisticRequest"
+                "$ref": "#/components/schemas/AddTransactionsCategoriesRequest"
               }
             }
           }
         },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddTransactionsCategoriesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (no token provided)",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid user / Invalid session",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/transactions/statistic/{month&year}": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Transactions statistic",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "month",
+            "description": "Month Transactions",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "description": "Year Transactions",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+
         "responses": {
           "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TransactionsSategoriesResponse"
+                  "$ref": "#/components/schemas/TransactionsStatisticResponse"
                 }
               }
             }
@@ -327,392 +364,433 @@
   },
   "components": {
     "schemas": {
-        "RegistrationRequest": {
-          "type": "object",
-          "required": [
-            "name",
-            "email",
-            "password"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "User's name",
-              "example": "Test"
-            },
-            "email": {
-              "type": "string",
-              "description": "User's email",
-              "format": "email"
-            },
-            "password": {
-              "type": "string",
-              "description": "User's password",
-              "example": "qwerty123"
-            }
+      "RegistrationRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "Test"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
           }
-        },
+        }
+      },
 
-        "RegistrationResponse": {
-          "type": "object",
-          "properties": {
-            "email": {
-              "type": "string",
-              "description": "User's email",
-              "format": "email"
-            },
-            "name": {
-              "type": "string",
-              "description": "User's name",
-              "example": "Test"
-            }
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "Test"
           }
-        },
+        }
+      },
 
-        "LoginRequest": {
-          "required": ["email", "password"],
-          "type": "object",
-          "properties": {
-            "email": {
-              "type": "string",
-              "description": "User's email",
-              "format": "email"
-            },
-            "password": {
-              "type": "string",
-              "description": "User's password",
-              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI1ZmMyMDg1YmQwOTM2NTI4MTA3Y2UyNzQiLCJzaWQiOiI1ZmMyZDJmY2UxZDIwNTA2NzAyYmRkMjIiLCJpYXQiOjE2MDY2MDM1MTYsImV4cCI6MTYwNjYwNzExNn0.rJ_QjU4KvA76H96RHsvOBChK0Vjbd0NmqjMxdQVJIXA"
-            }
+      "LoginRequest": {
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI1ZmMyMDg1YmQwOTM2NTI4MTA3Y2UyNzQiLCJzaWQiOiI1ZmMyZDJmY2UxZDIwNTA2NzAyYmRkMjIiLCJpYXQiOjE2MDY2MDM1MTYsImV4cCI6MTYwNjYwNzExNn0.rJ_QjU4KvA76H96RHsvOBChK0Vjbd0NmqjMxdQVJIXA"
           }
-        },
+        }
+      },
 
-        "LoginResponse": {
-          "type": "object",
-          "properties": {
-            "token": {
-              "type": "string",
-              "description": "Session's access token (needed for all requests)",
-              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI1ZmMyMDg1YmQwOTM2NTI4MTA3Y2UyNzQiLCJzaWQiOiI1ZmMyZDJmY2UxZDIwNTA2NzAyYmRkMjIiLCJpYXQiOjE2MDY2MDM1MTYsImV4cCI6MTYwNjYwNzExNn0.rJ_QjU4KvA76H96RHsvOBChK0Vjbd0NmqjMxdQVJIXA"
-            },
-            "userData": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "User's name",
-                  "example": "Test"
-                },
-                "email": {
-                  "type": "string",
-                  "description": "User's email",
-                  "format": "email"
-                },
-                "id": {
-                  "type": "string",
-                  "description": "User's id",
-                  "example": "507f1f77bcf86cd799439013"
-                }
-              }
-            }
-          }
-        },
-
-        "UserDataResponse": {
-          "type": "object",
-          "properties": {
-            "data": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "User's name",
-                  "example": "Test"
-                },
-                "email": {
-                  "type": "string",
-                  "description": "User's email",
-                  "format": "email"
-                },
-                "balance": {
-                  "type": "string",
-                  "description": "User's id",
-                  "example": "123123"
-                }
-              }
-            }
-          }
-        },
-
-        "TransactionsResponse": {
-          "type": "object",
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Session's access token (needed for all requests)",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI1ZmMyMDg1YmQwOTM2NTI4MTA3Y2UyNzQiLCJzaWQiOiI1ZmMyZDJmY2UxZDIwNTA2NzAyYmRkMjIiLCJpYXQiOjE2MDY2MDM1MTYsImV4cCI6MTYwNjYwNzExNn0.rJ_QjU4KvA76H96RHsvOBChK0Vjbd0NmqjMxdQVJIXA"
+          },
+          "userData": {
+            "type": "object",
             "properties": {
-              "userTransactions": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Test"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "507f1f77bcf86cd799439013"
+              }
+            }
+          }
+        }
+      },
+
+      "UserDataResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Test"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "balance": {
+                "type": "string",
+                "description": "User's id",
+                "example": "123123"
+              }
+            }
+          }
+        }
+      },
+
+      "TransactionsResponse": {
+        "type": "object",
+          "properties": {
+            "userTransactions": {
+              "type": "object",
+              "properties": {
+              "totalTransactions": {
+                "type": "integer",
+                "description": "Transaction total",
+                "example": "123"
+              },
+              "totalPages": {
+                "type": "integer",
+                "description": "Transaction total",
+                "example": "123"
+              },
+              "transactions": {
+                "type": "array",
+                "description": "User's Transactions list",
+                "items": {
+                  "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "Transaction id",
+                        "example": "qwerty123"
+                      },
+                      "transactionType": {
+                        "type": "boolean",
+                        "description": "Transaction type",
+                        "example": "true/false"
+                      },
+                      "sum": {
+                        "type": "integer",
+                        "description": "Transaction sum",
+                        "example": "123"
+                      },
+                      "date": {
+                        "type": "date",
+                        "description": "Transaction date",
+                        "example": "31.12.2021"
+                      },
+                      "trDay": {
+                        "type": "integer",
+                        "description": "Transaction day",
+                        "example": "31"
+                      },
+                      "trMonth": {
+                        "type": "integer",
+                        "description": "Transaction month",
+                        "example": "12"
+                      },
+                      "trYear": {
+                        "type": "integer",
+                        "description": "Transaction year",
+                        "example": "2021"
+                      },
+                      "owner":{
+                        "type": "string",
+                        "description": "Transaction owner",
+                        "example": "qwerty123"
+                      },
+                      "category":{
+                        "type": "string",
+                        "description": "Transaction category",
+                        "example": "donation"
+                      },
+                      "comment":{
+                        "type": "string",
+                        "description": "Transaction comment",
+                        "example": "git commit"
+                      },
+                      "balance": {
+                        "type": "integer",
+                        "description": "User's balance",
+                        "example": "9999999"
+                      }
+                    }
+                }
+              }
+            }
+          }
+        }
+      },
+      
+      "AddTransactionsRequest": {
+        "required": ["transactionType", "sum", "date"],
+        "type": "object",
+        "properties": {
+          "transactionType": {
+            "type": "boolean",
+            "description": "Transaction type",
+            "example": "true / false"
+          },
+          "sum": {
+            "type": "integer",
+            "description": "Transaction sum",
+            "example": "123"
+          },
+          "date": {
+            "type": "string",
+            "description": "Transaction date",
+            "example": "31.12.2021"            
+          },
+          "category":{
+            "type": "string",
+            "description": "Transaction category",
+            "example": "any" 
+          },
+          "comment":{
+            "type": "string",
+            "description": "Transaction comment",
+            "example": "git comit" 
+          }
+        }
+      },
+
+      "AddTransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "data":{
+            "type": "object",
+            "properties": {
+              "transaction":{
                 "type": "object",
                 "properties": {
-                "totalTransactions": {
-                  "type": "integer",
-                  "description": "Transaction total",
-                  "example": "123"
-                },
-                "totalPages": {
-                  "type": "integer",
-                  "description": "Transaction total",
-                  "example": "123"
-                },
-                "transactions": {
-                  "type": "array",
-                  "description": "User's Transactions list",
-                  "items": {
-                    "type": "object",
-                      "properties": {
-                        "_id": {
-                          "type": "string",
-                          "description": "Transaction id",
-                          "example": "qwerty123"
-                        },
-                        "transactionType": {
-                          "type": "boolean",
-                          "description": "Transaction type",
-                          "example": "true/false"
-                        },
-                        "sum": {
-                          "type": "integer",
-                          "description": "Transaction sum",
-                          "example": "123"
-                        },
-                        "date": {
-                          "type": "date",
-                          "description": "Transaction date",
-                          "example": "31.12.2021"
-                        },
-                        "trDay": {
-                          "type": "integer",
-                          "description": "Transaction day",
-                          "example": "31"
-                        },
-                        "trMonth": {
-                          "type": "integer",
-                          "description": "Transaction month",
-                          "example": "12"
-                        },
-                        "trYear": {
-                          "type": "integer",
-                          "description": "Transaction year",
-                          "example": "2021"
-                        },
-                        "owner":{
-                          "type": "string",
-                          "description": "Transaction owner",
-                          "example": "qwerty123"
-                        },
-                        "category":{
-                          "type": "string",
-                          "description": "Transaction category",
-                          "example": "donation"
-                        },
-                        "comment":{
-                          "type": "string",
-                          "description": "Transaction comment",
-                          "example": "git commit"
-                        },
-                        "balance": {
-                          "type": "integer",
-                          "description": "User's balance",
-                          "example": "9999999"
-                        }
-                      }
+                  "_id": {
+                    "type": "string",
+                    "description": "Transaction id",
+                    "example": "qwerty123"
+                  },
+                  "transactionType": {
+                    "type": "boolean",
+                    "description": "Transaction type",
+                    "example": "true/false"
+                  },
+                  "sum": {
+                    "type": "integer",
+                    "description": "Transaction sum",
+                    "example": "123"
+                  },
+                  "date": {
+                    "type": "date",
+                    "description": "Transaction date",
+                    "example": "31.12.2021"
+                  },
+                  "trDay": {
+                    "type": "integer",
+                    "description": "Transaction day",
+                    "example": "31"
+                  },
+                  "trMonth": {
+                    "type": "integer",
+                    "description": "Transaction month",
+                    "example": "12"
+                  },
+                  "trYear": {
+                    "type": "integer",
+                    "description": "Transaction year",
+                    "example": "2021"
+                  },
+                  "owner":{
+                    "type": "string",
+                    "description": "Transaction owner",
+                    "example": "qwerty123"
+                  },
+                  "category":{
+                    "type": "string",
+                    "description": "Transaction category",
+                    "example": "any" 
+                  },
+                  "comment":{
+                    "type": "string",
+                    "description": "Transaction comment",
+                    "example": "git comit" 
+                  },
+                  "balance": {
+                    "type": "integer",
+                    "description": "User's balance",
+                    "example": "9999999"
                   }
                 }
               }
             }
           }
-        },
+        }
+      },
 
-        "AddTransactionsRequest": {
-          "required": ["transactionType", "sum", "date"],
-          "type": "object",
+      "TransactionsCategoriesResponse": {
+        "type": "object",
           "properties": {
-            "transactionType": {
-              "type": "boolean",
-              "description": "Transaction type",
-              "example": "true / false"
-            },
-            "sum": {
-              "type": "integer",
-              "description": "Transaction sum",
-              "example": "123"
-            },
-            "date": {
-              "type": "string",
-              "description": "Transaction date",
-              "example": "31.12.2021"            
-            },
-            "category":{
-              "type": "string",
-              "description": "Transaction category",
-              "example": "any" 
-            },
-            "comment":{
-              "type": "string",
-              "description": "Transaction comment",
-              "example": "git comit" 
-            }
-          }
-        },
-
-        "AddTransactionsResponse": {
-          "type": "object",
-          "properties": {
-            "data":{
+            "data": {
               "type": "object",
               "properties": {
-                "transaction":{
+              "categories": {
+                "type": "array",
+                "description": "Transaction categories list",
+                "items": {
                   "type": "object",
                   "properties": {
-                    "_id": {
+                    "id": {
                       "type": "string",
-                      "description": "Transaction id",
+                      "description": "Id categorie",
                       "example": "qwerty123"
                     },
-                    "transactionType": {
-                      "type": "boolean",
-                      "description": "Transaction type",
-                      "example": "true/false"
-                    },
-                    "sum": {
-                      "type": "integer",
-                      "description": "Transaction sum",
-                      "example": "123"
-                    },
-                    "date": {
-                      "type": "date",
-                      "description": "Transaction date",
-                      "example": "31.12.2021"
-                    },
-                    "trDay": {
-                      "type": "integer",
-                      "description": "Transaction day",
-                      "example": "31"
-                    },
-                    "trMonth": {
-                      "type": "integer",
-                      "description": "Transaction month",
-                      "example": "12"
-                    },
-                    "trYear": {
-                      "type": "integer",
-                      "description": "Transaction year",
-                      "example": "2021"
-                    },
-                    "owner":{
+                    "name": {
                       "type": "string",
-                      "description": "Transaction owner",
-                      "example": "qwerty123"
-                    },
-                    "category":{
-                      "type": "string",
-                      "description": "Transaction category",
-                      "example": "any" 
-                    },
-                    "comment":{
-                      "type": "string",
-                      "description": "Transaction comment",
-                      "example": "git comit" 
-                    },
-                    "balance": {
-                      "type": "integer",
-                      "description": "User's balance",
-                      "example": "9999999"
+                      "description": "Name categorie",
+                      "example": "donate"
+                    }
+                  }
+                },
+                "example": [
+                  {"id": "123123", "name": "food"},
+                  {"id": "321321", "name": "dog"}
+                ]
+              }
+            }
+          }
+        }
+      },
+
+      "AddTransactionsCategoriesRequest": {
+        "required": ["name"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Categories name",
+            "example": "donate"
+          }
+        }
+      },
+
+      "AddTransactionsCategoriesResponse": {
+        "type": "object",
+        "properties": {
+          "data":{
+            "type": "object",
+            "properties": {
+              "category":{
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Category name",
+                    "example": "donate"
+                  },
+                  "hex": {
+                    "type": "string",
+                    "description": "Category color",
+                    "example": "#0000"
+                  },
+                  "owner":{
+                    "type": "string",
+                    "description": "Category owner",
+                    "example": "qwerty123"
+                  },
+                  "_id":{
+                    "type": "string",
+                    "description": "Category id",
+                    "example": "qwerty123"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "TransactionsStatisticResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "statistic":{
+                "type": "object",
+                "properties": {
+                  "name":{
+                    "type": "object",
+                    "description": "Name statistic",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name statistic",
+                        "example": "donate"
+                      },
+                      "sum": {
+                        "type": "integer",
+                        "description": "Transaction sum",
+                        "example": "123"
+                      },
+                      "hex": {
+                        "type": "string",
+                        "description": "Category color",
+                        "example": "#0000"
+                      },
+                      "_id":{
+                        "type": "string",
+                        "description": "Category id",
+                        "example": "qwerty123"
+                      }
                     }
                   }
                 }
               }
             }
-          }
-        },
-
-        "TransactionsStatisticRequest": {
-          "required": ["user"],
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "string",
-              "description": "User's id",
-              "format": "123456qwerty"
-            },
-            "transactionType": {
-              "type": "string",
-              "description": "Transaction type",
-              "example": "+ / -"
-            },
-            "sum": {
-              "type": "integer",
-              "description": "Transaction sum",
-              "example": "123"
-            },
-            "date": {
-              "type": "string",
-              "description": "Transaction date",
-              "example": "2021-09-03T21:00:00.000Z"            
-            },
-            "category":{
-              "type": "string",
-              "description": "Transaction category",
-              "example": "any" 
-            }
-          }
-        },
-
-        "TransactionsStatisticResponse": {
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "string",
-              "description": "Transaction id",
-              "example": "qwerty123"
-            },
-            "transactionType": {
-              "type": "boolean",
-              "description": "Transaction type",
-              "example": "true/false"
-            },
-            "sum": {
-              "type": "integer",
-              "description": "Transaction sum",
-              "example": "123"
-            },
-            "date": {
-              "type": "date",
-              "description": "Transaction date",
-              "example": "2021-09-03T21:00:00.000Z"
-            },
-            "trDay": {
-              "type": "integer",
-              "description": "Transaction day",
-              "example": "31"
-            },
-            "trMonth": {
-              "type": "integer",
-              "description": "Transaction month",
-              "example": "12"
-            },
-            "trYear": {
-              "type": "integer",
-              "description": "Transaction year",
-              "example": "2021"
-            },
-            "owner":{
-              "type": "string",
-              "description": "Transaction owner",
-              "example": "qwerty123"
-            },
-            "balance": {
-              "type": "integer",
-              "description": "User's balance",
-              "example": "9999999"
-            }
-          }
+          }  
         }
+      }
     },
 
     "securitySchemes": {
