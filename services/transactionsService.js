@@ -87,22 +87,21 @@ class ContactsService {
 
   static async getTransactions(req) {
     const { _id } = req.user;
-    const { page = 1, limit = 5 } = req.query;
-    const skip = (page - 1) * limit;
-    const pages = await Transaction.find({ owner: _id });
+    // const { page = 1, limit = 5 } = req.query;
+    // const skip = (page - 1) * limit;
+    // const pages = await Transaction.find({ owner: _id });
     const transactions = await Transaction.find(
       { owner: _id },
-      'date transactionType category comment sum balance',
+      'trDay trMonth trYear transactionType category comment sum balance',
     )
       .sort({ trYear: -1, trMonth: -1, trDay: -1 })
-      .skip(skip)
-      .limit(limit)
+      // .skip(skip)
+      // .limit(limit)
       .populate('category', 'name hex');
 
     const totalPages = Math.ceil(pages.length / limit);
     const data = {
-      totalTransactions: pages.length,
-      totalPages: totalPages,
+      // totalTransactions: pages.length,
       transactions,
     };
     return data;
