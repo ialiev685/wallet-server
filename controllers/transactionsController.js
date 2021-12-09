@@ -9,7 +9,7 @@ class TransactionsController {
   static async addTransactionCtrl(req, res) {
     const { _id } = req.user;
     const transaction = await TransactionsService.addTransaction(req.body, _id);
-    return res.send({
+    return res.status(HttpCodes.CREATED).send({
       success: true,
       code: HttpCodes.CREATED,
       data: {
@@ -58,7 +58,7 @@ class TransactionsController {
       data: {
         statistic,
       },
-      message: `User ${name} expense statistics`
+      message: `User ${name} income and expense statistics`
     })
 
   }
@@ -67,7 +67,7 @@ class TransactionsController {
     const { _id } = req.user
     const { name } = req.body
     const category = await TransactionsService.addTransactionCategory(_id, name)
-    return res.send({
+    return res.status(HttpCodes.CREATED).send({
       success: true,
       code: HttpCodes.CREATED,
       data: {

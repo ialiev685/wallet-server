@@ -8,7 +8,7 @@ const TransactionSchema = new Schema(
       type: Boolean,
       required: [
         true,
-        'Select the type of transaction: income(true) or expense(false)',
+        'Select the type of transaction: income(false) or expense(true)',
       ],
     },
     sum: {
