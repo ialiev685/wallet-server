@@ -130,6 +130,9 @@ class ContactsService {
     if (!trYear && trMonth) {
        transactions = await Transaction.find({ owner, trMonth }).populate('category', { name: 1, hex: 1, _id: 0 })  
     }
+     if (trYear && trMonth) {
+       transactions = await Transaction.find({ owner, trMonth, trYear }).populate('category', { name: 1, hex: 1, _id: 0 })  
+    }
 
     if (transactions.length !== 0) {
      statistic= transactions.reduce((acc, el) => {
