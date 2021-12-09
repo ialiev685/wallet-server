@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Transaction, User, Category } from '../models/index.js';
 import { getRanHex, BadRequestError, generateId } from '../helpers/index.js';
 
@@ -11,24 +12,28 @@ class ContactsService {
 
     let userBalance;
 
-    if (body.transactionType) {
+    if (!body.transactionType) {
       userBalance = user.balance + sum;
     } else {
       userBalance = user.balance - sum;
+      console.log(user.balance, sum, userBalance);
     }
 
     await User.findByIdAndUpdate(owner, {
       balance: userBalance,
     });
-    const nextTransactions = await Transaction.aggregate([
-      { $match: { owner }, $match: { date: { $gte: new Date(body.date) } } },
+
+    const nextTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
+      {  $match: { date: { $gte: new Date(body.date) } } },
     ]);
-    const previousTransactions = await Transaction.aggregate([
-      { $match: { owner }, $match: { date: { $lt: new Date(body.date) } } },
+
+    const previousTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
+      { $match: { date: { $lt: new Date(body.date) } } },
     ]).sort({ date: -1 });
     const previousTransaction = previousTransactions[0];
 
     if (nextTransactions.length === 0) {
+      
       const transaction = await Transaction.create({
         ...body,
         trDay,
@@ -41,13 +46,13 @@ class ContactsService {
     }
 
     if (previousTransaction) {
-      if (body.transactionType) {
+      if (!body.transactionType) {
         userBalance = previousTransaction.balance + sum;
       } else {
         userBalance = previousTransaction.balance - sum;
       }
     } else {
-      if (body.transactionType) {
+      if (!body.transactionType) {
         userBalance = sum;
       } else {
         userBalance = -sum;
@@ -66,7 +71,7 @@ class ContactsService {
     if (nextTransactions) {
       nextTransactions.map(async el => {
         const id = el._id;
-        if (body.transactionType) {
+        if (!body.transactionType) {
           await Transaction.findByIdAndUpdate(id, {
             balance: el.balance + sum,
           });
@@ -104,70 +109,68 @@ class ContactsService {
   }
 
   static async getTransactionCategories(owner) {
-    const userCategories = await Category.find({ owner });
-    const basicCategories = await Category.find({ basic: 'basic' });
-    const selectedUserCategories = userCategories.map(el => {
-      const categoryObj = {
-        name: el.name,
-        id: el._id,
-      };
-      return categoryObj;
-    });
-    const selectedBasicCategories = basicCategories.map(el => {
-      const categoryObj = {
-        name: el.name,
-        id: el._id,
-      };
-      return categoryObj;
-    });
-    const categories = [...selectedBasicCategories, ...selectedUserCategories];
+    const userCategories = await Category.find({ owner }, 'name _id');
+    const basicCategories = await Category.find({ basic: 'basic' }, 'name _id');
+
+    const categories = [ ...basicCategories, ...userCategories];
     return categories;
   }
 
-  static async getTransactionsStatistic(owner, month, year) {
-    let transactions;
+  static async getTransactionsStatistic(owner, trMonth, trYear) {
 
-    if (year && month) {
-      transactions = await Transaction.find({
-        owner,
-        trYear: year,
-        trMonth: month,
-        transactionType: false,
-      }).populate('category', { name: 1, hex: 1, _id: 0 });
+    let transactions
+    let statistic
+
+    if (!trYear && !trMonth) {
+       transactions = await Transaction.find({ owner}).populate('category', { name: 1, hex: 1, _id: 0 })
     }
-    if (year && !month) {
-      transactions = await Transaction.find({
-        owner,
-        trYear: year,
-        transactionType: false,
-      }).populate('category', { name: 1, hex: 1, _id: 0 });
+    if (trYear && !trMonth) { 
+       transactions = await Transaction.find({ owner, trYear }).populate('category', { name: 1, hex: 1, _id: 0 })
     }
-    if (!year && month) {
-      transactions = await Transaction.find({
-        owner,
-        trYear: new Date().getFullYear(),
-        trMonth: month,
-        transactionType: false,
-      }).populate('category', { name: 1, hex: 1, _id: 0 });
+    if (!trYear && trMonth) {
+       transactions = await Transaction.find({ owner, trMonth }).populate('category', { name: 1, hex: 1, _id: 0 })  
     }
 
-    const statistic = transactions.reduce((acc, el) => {
-      const name = el.category.name;
-      const hex = el.category.hex;
-      const sum = el.sum;
+    if (transactions.length !== 0) {
+     statistic= transactions.reduce((acc, el) => {
+       const sum = el.sum;
 
-      return {
-        ...acc,
-        [name]: {
-          name: name,
-          sum: acc[name] ? acc[name].sum + sum : sum,
-          hex,
-          id: generateId(),
-        },
-      };
-    }, {});
+       if (el.transactionType) {
+          const name = el.category.name;
+          const hex = el.category.hex;
+          return {
+            ...acc,
+            'expense': {
+              ...acc.expense,
+              [name]: {
+                name: name,
+                sum: acc.expense[name] ? acc.expense[name].sum + sum : sum,
+                hex,
+                id: generateId(),
+              }
+            },
+           'expenseBalance': acc.expenseBalance ? acc.expenseBalance + sum : sum
+         }
+        }
+        return {
+          ...acc,
+          'incomeBalance': acc.incomeBalance ? acc.incomeBalance + sum : sum
+      }  
+      },{'expense':{}})
+    }
+    let incomeBalance=0
+    let expenseBalance=0
+    let expenseStatistic=[]
 
-    return statistic;
+    if (statistic) {
+
+     const { expense , incomeBalance = 0, expenseBalance = 0 } = statistic
+     expenseStatistic=Object.values(expense)
+      
+     return  {expenseStatistic, incomeBalance, expenseBalance }
+    }
+    
+    return {expenseStatistic, incomeBalance, expenseBalance }
   }
 
   static async addTransactionCategory(owner, name) {
