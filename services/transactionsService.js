@@ -6,9 +6,11 @@ class ContactsService {
   // eslint-disable-next-line no-useless-constructor
   constructor() {}
   static async addTransaction(body, owner) {
-    const { sum } = body;
-    const [trMonth, trDay, trYear] = body.date.split('.');
+    const { sum, date } = body;
     const user = await User.findById(owner);
+    const newDate= new Date(date)
+    const trMonth=newDate.getMonth()+1
+    const [, , trDay, trYear,]=date.split(' ')
 
     let userBalance;
 
@@ -24,11 +26,11 @@ class ContactsService {
     });
 
     const nextTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
-      {  $match: { date: { $gte: new Date(body.date) } } },
+      {  $match: { date: { $gt: newDate } } },
     ]);
 
     const previousTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
-      { $match: { date: { $lt: new Date(body.date) } } },
+      { $match: { date: { $lt: newDate } } },
     ]).sort({ date: -1 });
     const previousTransaction = previousTransactions[0];
 
@@ -44,7 +46,6 @@ class ContactsService {
       });
       return transaction;
     }
-
     if (previousTransaction) {
       if (!body.transactionType) {
         userBalance = previousTransaction.balance + sum;
