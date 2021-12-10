@@ -8,9 +8,9 @@ class ContactsService {
   static async addTransaction(body, owner) {
     const { sum, date } = body;
     const user = await User.findById(owner);
-    const newDate= new Date(date)
-    const trMonth=newDate.getMonth()+1
-    const [, , trDay, trYear,]=date.split(' ')
+    const trDay = date.getDate()
+    const trMonth=date.getMonth()+1
+    const trYear=date.getFullYear()
 
     let userBalance;
 

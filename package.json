@@ -22,6 +22,7 @@
     "lint:fix": "eslint --fix **/*.js"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
