@@ -23,4 +23,6 @@ router.get(
   asyncWrapper(AuthController.findCurrentUserCtrl),
 );
 
+router.get('/verify/:verifyToken', asyncWrapper(AuthController.verifyUserCtrl));
+
 export default router;

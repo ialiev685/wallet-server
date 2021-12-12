@@ -62,6 +62,14 @@ class AuthController {
       },
     });
   }
+
+  static async verifyUserCtrl(req, res) {
+    const { verifyToken } = req.params;
+    const { token, user } = await AuthService.verifyUser(verifyToken);
+    res.send(
+      `<h2>Email confirmed</h2> <p>To continue, follow the link: <a href="https://wallet-rf1.herokuapp.com/api/users/login">go to the Login form</a></p`,
+    );
+  }
 }
 
 export default AuthController;

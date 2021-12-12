@@ -8,10 +8,9 @@ class ContactsService {
   static async addTransaction(body, owner) {
     const { sum, date } = body;
     const user = await User.findById(owner);
-    const newDate = new Date(date)
-    const trMonth=newDate.getMonth()+1
-    const [, , trDay, trYear,]=date.split(' ')
-    
+    const newDate = new Date(date);
+    const trMonth = newDate.getMonth() + 1;
+    const [, , trDay, trYear] = date.split(' ');
 
     let userBalance;
 
@@ -26,17 +25,18 @@ class ContactsService {
       balance: userBalance,
     });
 
-    const nextTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
-      {  $match: { date: { $gt: newDate } } },
+    const nextTransactions = await Transaction.aggregate([
+      { $match: { owner: mongoose.Types.ObjectId(owner) } },
+      { $match: { date: { $gt: newDate } } },
     ]);
 
-    const previousTransactions = await Transaction.aggregate([{$match:{'owner':mongoose.Types.ObjectId(owner)}},
+    const previousTransactions = await Transaction.aggregate([
+      { $match: { owner: mongoose.Types.ObjectId(owner) } },
       { $match: { date: { $lt: newDate } } },
     ]).sort({ date: -1 });
     const previousTransaction = previousTransactions[0];
 
     if (nextTransactions.length === 0) {
-      
       const transaction = await Transaction.create({
         ...body,
         trDay,
@@ -114,68 +114,85 @@ class ContactsService {
     const userCategories = await Category.find({ owner }, 'name _id');
     const basicCategories = await Category.find({ basic: 'basic' }, 'name _id');
 
-    const categories = [ ...basicCategories, ...userCategories];
+    const categories = [...basicCategories, ...userCategories];
     return categories;
   }
 
   static async getTransactionsStatistic(owner, trMonth, trYear) {
-
-    let transactions
-    let statistic
+    let transactions;
+    let statistic;
 
     if (!trYear && !trMonth) {
-       transactions = await Transaction.find({ owner}).populate('category', { name: 1, hex: 1, _id: 0 })
+      transactions = await Transaction.find({ owner }).populate('category', {
+        name: 1,
+        hex: 1,
+        _id: 0,
+      });
     }
-    if (trYear && !trMonth) { 
-       transactions = await Transaction.find({ owner, trYear }).populate('category', { name: 1, hex: 1, _id: 0 })
+    if (trYear && !trMonth) {
+      transactions = await Transaction.find({ owner, trYear }).populate(
+        'category',
+        { name: 1, hex: 1, _id: 0 },
+      );
     }
     if (!trYear && trMonth) {
-       transactions = await Transaction.find({ owner, trMonth }).populate('category', { name: 1, hex: 1, _id: 0 })  
+      transactions = await Transaction.find({ owner, trMonth }).populate(
+        'category',
+        { name: 1, hex: 1, _id: 0 },
+      );
     }
-     if (trYear && trMonth) {
-       transactions = await Transaction.find({ owner, trMonth, trYear }).populate('category', { name: 1, hex: 1, _id: 0 })  
+    if (trYear && trMonth) {
+      transactions = await Transaction.find({
+        owner,
+        trMonth,
+        trYear,
+      }).populate('category', { name: 1, hex: 1, _id: 0 });
     }
 
     if (transactions.length !== 0) {
-     statistic= transactions.reduce((acc, el) => {
-       const sum = el.sum;
+      statistic = transactions.reduce(
+        (acc, el) => {
+          const sum = el.sum;
 
-       if (el.transactionType) {
-          const name = el.category.name;
-          const hex = el.category.hex;
+          if (el.transactionType) {
+            const name = el.category.name;
+            const hex = el.category.hex;
+            return {
+              ...acc,
+              expense: {
+                ...acc.expense,
+                [name]: {
+                  name: name,
+                  sum: acc.expense[name] ? acc.expense[name].sum + sum : sum,
+                  hex,
+                  id: generateId(),
+                },
+              },
+              expenseBalance: acc.expenseBalance
+                ? acc.expenseBalance + sum
+                : sum,
+            };
+          }
           return {
             ...acc,
-            'expense': {
-              ...acc.expense,
-              [name]: {
-                name: name,
-                sum: acc.expense[name] ? acc.expense[name].sum + sum : sum,
-                hex,
-                id: generateId(),
-              }
-            },
-           'expenseBalance': acc.expenseBalance ? acc.expenseBalance + sum : sum
-         }
-        }
-        return {
-          ...acc,
-          'incomeBalance': acc.incomeBalance ? acc.incomeBalance + sum : sum
-      }  
-      },{'expense':{}})
+            incomeBalance: acc.incomeBalance ? acc.incomeBalance + sum : sum,
+          };
+        },
+        { expense: {} },
+      );
     }
-    let incomeBalance=0
-    let expenseBalance=0
-    let expenseStatistic=[]
+    let incomeBalance = 0;
+    let expenseBalance = 0;
+    let expenseStatistic = [];
 
     if (statistic) {
+      const { expense, incomeBalance = 0, expenseBalance = 0 } = statistic;
+      expenseStatistic = Object.values(expense);
 
-     const { expense , incomeBalance = 0, expenseBalance = 0 } = statistic
-     expenseStatistic=Object.values(expense)
-      
-     return  {expenseStatistic, incomeBalance, expenseBalance }
+      return { expenseStatistic, incomeBalance, expenseBalance };
     }
-    
-    return {expenseStatistic, incomeBalance, expenseBalance }
+
+    return { expenseStatistic, incomeBalance, expenseBalance };
   }
 
   static async addTransactionCategory(owner, name) {
