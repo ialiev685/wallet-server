@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "version": "1.02",
+    "version": "1.03",
     "title": "Wallet API",
     "description": "Application for conducting and accounting bank's transactions",
     "license": {
@@ -166,11 +166,25 @@
       }
     },
 
-    "/api/transactions": {
+    "/api/transactions/{page&limit}": {
       "get": {
         "tags": ["Transactions"],
         "summary": "User Transactions",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "page",
+            "description": "Page from Totla Transactions",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "limit",
+            "description": "Limit Transactions on page",
+            "type": "string"
+          }
+        ],
         "security": [{ "Bearer": [] }],
 
         "responses": {
@@ -193,7 +207,10 @@
             "content": {}
           }
         }
-      },
+      }
+    },
+
+    "/api/transactions/": {
         "post": {
         "tags": ["Transactions"],
         "summary": "Transactions add",
@@ -703,13 +720,13 @@
       },
 
       "AddTransactionsCategoriesRequest": {
-        "required": ["name"],
+        "required": ["ObjectId"],
         "type": "object",
         "properties": {
-          "name": {
+          "ObjectId": {
             "type": "string",
-            "description": "Categories name",
-            "example": "donate"
+            "description": "Categories id",
+            "example": "qwerty123"
           }
         }
       },
