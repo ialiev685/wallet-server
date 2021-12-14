@@ -136,9 +136,11 @@ class ContactsService {
     }
 
     if (transactions.length !== 0) {
+      
      statistic= transactions.reduce((acc, el) => {
        const sum = el.sum;
-
+       const year = el.trYear
+       
        if (el.transactionType) {
           const name = el.category.name;
           const hex = el.category.hex;
@@ -153,28 +155,40 @@ class ContactsService {
                 id: generateId(),
               }
             },
-           'expenseBalance': acc.expenseBalance ? acc.expenseBalance + sum : sum
+            'expenseBalance': acc.expenseBalance ? acc.expenseBalance + sum : sum,
+            'years': {
+            ...acc.years,
+            [year]: true
+          }
          }
         }
         return {
           ...acc,
-          'incomeBalance': acc.incomeBalance ? acc.incomeBalance + sum : sum
+          'incomeBalance': acc.incomeBalance ? acc.incomeBalance + sum : sum,
+          'years': {
+            ...acc.years,
+            [year]: true
+          }
       }  
-      },{'expense':{}})
+     }, { 'expense': {}, 'years': {} })
+     
     }
+
     let incomeBalance=0
     let expenseBalance=0
-    let expenseStatistic=[]
+    let expenseStatistic = []
+    let allYears = []
 
     if (statistic) {
 
-     const { expense , incomeBalance = 0, expenseBalance = 0 } = statistic
-     expenseStatistic=Object.values(expense)
+     const { expense , incomeBalance = 0, expenseBalance = 0, years } = statistic
+      expenseStatistic = Object.values(expense)
+      allYears =Object.keys(years)
       
-     return  {expenseStatistic, incomeBalance, expenseBalance }
+     return  {expenseStatistic, incomeBalance, expenseBalance, allYears }
     }
-    
-    return {expenseStatistic, incomeBalance, expenseBalance }
+ 
+    return {expenseStatistic, incomeBalance, expenseBalance, allYears }
   }
 
   static async addTransactionCategory(owner, name) {
