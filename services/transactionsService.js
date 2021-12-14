@@ -19,7 +19,6 @@ class ContactsService {
       userBalance = user.balance + sum;
     } else {
       userBalance = user.balance - sum;
-      console.log(user.balance, sum, userBalance);
     }
 
     await User.findByIdAndUpdate(owner, {
@@ -96,7 +95,7 @@ class ContactsService {
       { owner: _id },
       'date transactionType category comment sum balance',
     )
-      .sort({ trYear: -1, trMonth: -1, trDay: -1 })
+      .sort({ date: -1 })
       .skip(skip)
       .limit(limit)
       .populate('category', 'name hex');
